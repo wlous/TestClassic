@@ -20,18 +20,18 @@ namespace TestClassic.Services
             request.Apikey = apikey;//sätter productens apikey till den som fanns i url:en
 
             //lägger ihop apikey från url:en med sku:en i instansen request för att få det unika produktid:et
-            request.Id = apikey.ToString() + request.Skus.ElementAt(0).SKU;
+            //request.Id = apikey + request.Skus.ElementAt(0).SKU;
+            request.Id = apikey.ToString();
 
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
             merchRepo.CreateProduct(request);
             return request;
         }
 
-        public MerchantProductUpdateRequest UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
+        public MerchantProductUpdateRequest UpdateProduct(string apikey, MerchantProductUpdateRequest request)
         {
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
-
-           
+            merchRepo.UpdateProduct(apikey, request);
             
             return request;
         }

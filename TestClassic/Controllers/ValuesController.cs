@@ -50,7 +50,7 @@ namespace TestClassic.Controllers
         // PUT api/values/5
         [HttpPut]//ändra till post sedan enligt instruktioner?
         [ActionName("/SkuUpdateStatus")]
-        public HttpStatusCode Put(Guid apikey, [FromBody]MerchantProductUpdateRequest request)
+        public HttpStatusCode Put(string apikey, [FromBody]MerchantProductUpdateRequest request)
         {
             MerchantProductUpdateRequestService merchServ = new MerchantProductUpdateRequestService();
 
