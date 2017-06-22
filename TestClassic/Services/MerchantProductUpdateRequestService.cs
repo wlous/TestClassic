@@ -9,7 +9,7 @@ namespace TestClassic.Services
 {
     public class MerchantProductUpdateRequestService
     {
-        public MerchantProductUpdateRequest GetProduct(String apikey)
+        public MerchantProductUpdateRequest GetProduct(Guid apikey)
         {
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
             //string id = apikey.ToString();
@@ -31,8 +31,8 @@ namespace TestClassic.Services
         {
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
 
-            merchRepo.UpdateProduct(apikey, request);
-
+           
+            
             return request;
         }
 

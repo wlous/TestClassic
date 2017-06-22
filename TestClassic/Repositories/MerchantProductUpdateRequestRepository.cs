@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web;
+using System.Web.UI;
 using TestClassic.Models;
 using Nest;
 
@@ -36,7 +37,7 @@ namespace TestClassic.Repositories
             );
         }
 
-        public MerchantProductUpdateRequest GetProduct(String apikey)
+        public MerchantProductUpdateRequest GetProduct(Guid apikey)
         {
             var getResponse = client.Get<MerchantProductUpdateRequest>(apikey);
 
@@ -53,16 +54,15 @@ namespace TestClassic.Repositories
         }
         public MerchantProductUpdateRequest UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
         {
-            //Ta in apikey (en kombo av merchantid (en guid) och product id (sku) som inparameter. Detta är det unika produktid.
-            //hitta produkten i elasticsearch-instansen
-            var getResponse = client.Get<MerchantProductUpdateRequest>(apikey);// eller id?
+            var inStock = new
+            {
+                stockQuantity = request.Skus.ElementAt(0).InStock
+            };
 
-            //spara documentet i merchantproduct
-            var merchantProduct = getResponse.Source;
-            
-            //uppdatera produkten eller posta den?
-            //client.Update();
-            
+            var partialUpdateResponse = client.Update<MerchantProductUpdateRequest, object>(apikey, u => u
+                .Doc(inStock)
+            );
+
             return request;
         }
 
