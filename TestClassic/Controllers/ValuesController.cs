@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Web.Http;
 using TestClassic.Models;
 using TestClassic.Services;
-//förändring
 
 namespace TestClassic.Controllers
 {
@@ -30,7 +29,7 @@ namespace TestClassic.Controllers
         // GET api/values/5
 
         [HttpGet]
-        public MerchantProductUpdateRequest Get(String apikey)
+        public MerchantProductUpdateRequest Get(Guid apikey)
         {
             MerchantProductUpdateRequestService merchServ = new MerchantProductUpdateRequestService();
 
