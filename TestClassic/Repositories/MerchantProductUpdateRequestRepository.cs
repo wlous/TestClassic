@@ -38,7 +38,7 @@ namespace TestClassic.Repositories
 
             //});
             var productIndex = "products";
-            settings.DefaultIndex("louisesdatabas");
+            settings.DefaultIndex("louisesnewdatabas");
             client = new ElasticClient(settings);
             //detta är för testning så att jag tar bort indexet varje gång programmet körs.
             if (client.IndexExists(productIndex).Exists)
@@ -69,15 +69,13 @@ namespace TestClassic.Repositories
         }
         public MerchantProductUpdateRequest UpdateProduct(string apikey, MerchantProductUpdateRequest request)
         {
-            //https://stackoverflow.com/questions/39025484/elasticsearch-nest-insert-update
-            var inStock = new
-            {
-                stockQuantity = request.Skus.ElementAt(0).InStock
-            };
 
-            var partialUpdateResponse = client.Update<MerchantProductUpdateRequest, object>(apikey, u => u
-                .Doc(inStock)
-            );
+            //var getResponse = client.Get<MerchantProductUpdateRequest>(apikey);
+
+            //var product = getResponse.Source;
+
+
+            //var indexResponse= client.Index(product);
 
             return request;
         }
