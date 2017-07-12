@@ -187,6 +187,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\MerchantProductUpdateRequest.cs" />
+    <Compile Include="Models\ProductModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\MerchantProductUpdateRequestRepository.cs" />
     <Compile Include="Services\MerchantProductUpdateRequestService.cs" />

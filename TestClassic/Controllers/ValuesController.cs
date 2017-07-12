@@ -29,11 +29,9 @@ namespace TestClassic.Controllers
         // GET api/values/5
 
         [HttpGet]
-        public MerchantProductUpdateRequest Get(Guid apikey)
+        public void Get(Guid apikey)
         {
-            MerchantProductUpdateRequestService merchServ = new MerchantProductUpdateRequestService();
-
-            return merchServ.GetProduct(apikey); ;
+           
         }
 
         // POST api/values

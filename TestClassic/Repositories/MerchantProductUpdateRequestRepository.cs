@@ -38,7 +38,7 @@ namespace TestClassic.Repositories
 
             //});
             var productIndex = "products";
-            settings.DefaultIndex("louisesnewdatabas");
+            settings.DefaultIndex("louisesnewestdatabas");
             client = new ElasticClient(settings);
             //detta är för testning så att jag tar bort indexet varje gång programmet körs.
             if (client.IndexExists(productIndex).Exists)
@@ -52,11 +52,18 @@ namespace TestClassic.Repositories
             );
         }
 
-        public MerchantProductUpdateRequest GetProduct(Guid apikey)
+        public List<ProductModel> GetProducts(List<string> productIds)
         {
-            var getResponse = client.Get<MerchantProductUpdateRequest>(apikey);
-            
-            return getResponse.Source;
+            List<ProductModel> products = new List<ProductModel>();
+
+            foreach (var productId in productIds)
+            {
+                var getResponse = client.Get<ProductModel>(productId);
+
+                products.Add(getResponse.Source);
+            }
+
+            return products;
         }
         
         //nedanstående metod är bara för testpurposes, tas bort sedan
@@ -67,17 +74,14 @@ namespace TestClassic.Repositories
 
             return product;
         }
-        public MerchantProductUpdateRequest UpdateProduct(string apikey, MerchantProductUpdateRequest request)
+        public List<ProductModel> UpdateProduct(List<ProductModel> products)
         {
+            foreach (var product in products)
+            {
+               var indexResponse = client.Index(product);//fattar den själv att den ska radera de gamla produkterna?
+            }
 
-            //var getResponse = client.Get<MerchantProductUpdateRequest>(apikey);
-
-            //var product = getResponse.Source;
-
-
-            //var indexResponse= client.Index(product);
-
-            return request;
+            return products;
         }
 
         public void DeleteProduct (Guid apikey)

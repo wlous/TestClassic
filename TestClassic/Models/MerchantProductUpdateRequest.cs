@@ -16,7 +16,6 @@ namespace TestClassic.Models
     public class MerchantProductUpdateRequest
     {
         public Guid Apikey { get; set; }
-        public string Id { get; set; } 
 
         [XmlArray("skus")]
         [XmlArrayItem("sku_status")]
