@@ -52,15 +52,16 @@ namespace TestClassic.Repositories
             return getResponse.Source;
         }
                 
-        public HttpStatusCode UpdateProduct(ProductModel product)
+        public bool UpdateProduct(ProductModel product)
         {
             var indexResponse = client.Index(product);
-            if (indexResponse.ApiCall.HttpStatusCode == 200)
+            if (indexResponse.ApiCall.HttpStatusCode == (int)HttpStatusCode.OK)
             {
-                return HttpStatusCode.Accepted;
+                return true;
             }
             else
-                return HttpStatusCode.InternalServerError;    
+                Console.WriteLine(indexResponse.OriginalException.Message);
+                return false;    
         }
     }
 }

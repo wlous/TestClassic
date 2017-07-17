@@ -18,7 +18,7 @@ namespace TestClassic.Services
             {"test.cdon.fi", "fi"}
         };
 
-        public HttpStatusCode UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
+        public bool UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
         {
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
 
@@ -32,7 +32,7 @@ namespace TestClassic.Services
 
                 if(merchant == null)
                 {
-                    return HttpStatusCode.NotFound;
+                    return false;
                     //throw new NullReferenceException($"merchant with apikey: {apikey} is missing!");
                 }
 
@@ -66,7 +66,7 @@ namespace TestClassic.Services
                 //Skriv till ES anropa update i repository
                 merchRepo.UpdateProduct(product);
             }
-            return HttpStatusCode.OK;
+            return true;
         }
     }
 
