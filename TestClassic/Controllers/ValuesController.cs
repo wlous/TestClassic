@@ -18,7 +18,12 @@ namespace TestClassic.Controllers
                     return HttpStatusCode.BadRequest;
 
                 MerchantProductUpdateRequestService merchServ = new MerchantProductUpdateRequestService();
-                return merchServ.UpdateProduct(apikey, request);
+                bool productUpdated = merchServ.UpdateProduct(apikey, request);
+
+                if (productUpdated)
+                    return HttpStatusCode.OK;
+                else
+                    return HttpStatusCode.InternalServerError;
             }
             catch (Exception e)
             {
