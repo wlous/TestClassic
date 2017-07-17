@@ -1,89 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using TestClassic.Models;
 using TestClassic.Repositories;
+using Dapper;
+using System.Net;
 
 namespace TestClassic.Services
 {
     public class MerchantProductUpdateRequestService
     {
-        public List<ProductModel> GetProducts(Guid apikey, MerchantProductUpdateRequest request)
+        private Dictionary<string, string> _channelMappings = new Dictionary<string, string>
         {
-            List<string> productIds = new List<string>();
+            {"test.cdon.se", "se"},
+            {"test.cdon.no", "no"},
+            {"test.cdon.dk", "dk"},
+            {"test.cdon.fi", "fi"}
+        };
 
-            //hämta merchantid genom apikey från SQL-databas
-            int merchantId = 111;
-
-            //går igenom requestarrayen för att hitta sku, lägger ihop merchantid + sku och lägger in det i en arraylist av string.
-            foreach (MerchantProductData t in request.Skus)
-            {
-                productIds.Add(merchantId + t.SKU);
-            }
+        public HttpStatusCode UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
+        {
             MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
-            
-            return merchRepo.GetProducts(productIds);
-        }
-        public MerchantProductUpdateRequest CreateProduct(Guid apikey, MerchantProductUpdateRequest request)
-        {
 
-            MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
-            merchRepo.CreateProduct(request);
-            return request;
-        }
-
-        public MerchantProductUpdateRequest UpdateProduct(Guid apikey, MerchantProductUpdateRequest request)
-        {
-            //hämtar lista med de produkter som ska uppdateras från databasen
-            List<ProductModel> products = GetProducts(apikey, request);
-
-           
-            //här sker själva uppdateringen
-            for (int i = 0; i < request.Skus.Length; i++)
+            foreach(var sku in request.Skus)
             {
-                for (int j = 0; j < products.Count; j++)
+                string productId;
+
+                //hämta merchantid genom apikey från SQL-databas
+                var merchantRepo = new MerchantSqlRepository();
+                var merchant = merchantRepo.GetByApiKey(apikey);
+
+                if(merchant == null)
                 {
-                    if (products[i].SKU == request.Skus[j].SKU)
-                    {
-                        //status= online/offline
-                        products[i].Status = request.Skus[j].Status.ToString(); //kanske behöver casta till string först. alltså ((string)request.Skus[j].Status.ToString();
-                        //behöver jag sätta cdonproductstatus korrekt också?
-                       
-                        //exposestatus
-                        products[i].ExposedStatus = request.Skus[j].ExposeStatus.ToString();//kanske casta till string?
-
-                        //instock
-                        products[i].StockQuantity = request.Skus[j].InStock;
-
-                        //channels
-                        for (int k = 0; k < request.Skus[j].Channels.Length; k++)
-                        {
-                            for (int l = 0; l < products[i].SalesChannels.Length; l++)
-                            {
-                                if (products[i].SalesChannels[l].Culture == request.Skus[j].Channels[k].Culture)//är det culture som man ska jämföra?
-                                {
-                                    products[i].SalesChannels[l].Sellable = request.Skus[j].Channels[k].Sellable;
-                                    products[i].SalesChannels[l].OrdinaryPrice = request.Skus[j].Channels[k].OrdinaryPrice;
-                                    products[i].SalesChannels[l].CurrentPrice = request.Skus[j].Channels[k].CurrentPrice;
-                                    products[i].SalesChannels[l].VAT = request.Skus[j].Channels[k].VAT;
-                                }
-                            }   
-                        }
-                    }
+                    return HttpStatusCode.NotFound;
+                    //throw new NullReferenceException($"merchant with apikey: {apikey} is missing!");
                 }
+
+                string merchantId = merchant.MerchantId.ToString().ToLowerInvariant();
+
+                //hämta rätt produkt från DB
+                productId = merchantId + "-" + sku.SKU;
+                var product = merchRepo.GetProduct(productId);
+                if (product == null)
+                    continue;
+                
+                //Uppdatera lokala variabeln
+                product.Status = sku.Status.ToString(); 
+                product.ExposedStatus = sku.ExposeStatus.ToString();
+                product.StockQuantity = sku.InStock;
+
+                foreach(var channel in sku.Channels)
+                {
+                    var channelName = _channelMappings[channel.Channel];
+
+                    var productChannel = product.SalesChannels.FirstOrDefault(p => string.Equals(p.Culture, channelName, StringComparison.OrdinalIgnoreCase));
+                    if (productChannel == null)
+                        continue;
+
+                    productChannel.Sellable = channel.Sellable;
+                    productChannel.OrdinaryPrice = channel.OrdinaryPrice;
+                    productChannel.CurrentPrice = channel.CurrentPrice;
+                    productChannel.VAT = channel.VAT;
+                }
+               
+                //Skriv till ES anropa update i repository
+                merchRepo.UpdateProduct(product);
             }
-
-            MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
-            merchRepo.UpdateProduct(products);
-            return request;
+            return HttpStatusCode.OK;
         }
+    }
 
-        public void DeleteProduct(Guid apikey)
+    public class MerchantSqlRepository
+    {
+        public Merchant GetByApiKey(Guid key)
         {
-            MerchantProductUpdateRequestRepository merchRepo = new MerchantProductUpdateRequestRepository();
-
-            merchRepo.DeleteProduct(apikey);
+            using (var connection = new System.Data.SqlClient.SqlConnection(@"Data Source=sql-cl1.test.cdon.com\cl1; Initial Catalog=merchantadmin;User ID=merchant_admin;password=pGM@c1rE;"))
+            {
+                return connection
+                    .Query<Merchant>("select MerchantId from merchant.tMerchant where ApiKey = @ApiKey", new { ApiKey = key })
+                    .FirstOrDefault();
+            }
         }
+    }
+
+    public class Merchant
+    {
+        public Guid MerchantId { get; set; }
     }
 }
