@@ -1,3 +1,4 @@
+C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\obj\Debug\TestClassic.csprojResolveAssemblyReference.cache
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\ApplicationInsights.config
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\roslyn\csc.exe
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\roslyn\csc.exe.config
@@ -96,6 +97,7 @@ C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\System.Web.WebPages.xml
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\System.Web.WebPages.Deployment.xml
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\System.Web.WebPages.Razor.xml
-C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\obj\Debug\TestClassic.csprojResolveAssemblyReference.cache
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\obj\Debug\TestClassic.dll
 C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\obj\Debug\TestClassic.pdb
+C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\Dapper.dll
+C:\Users\louiahok\documents\visual studio 2017\Projects\TestClassic\TestClassic\bin\Dapper.xml

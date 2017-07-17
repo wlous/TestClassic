@@ -1,26 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
-using System.Text;
-using System.Web;
-using System.Web.UI;
 using TestClassic.Models;
 using Nest;
+using System.Net;
 
 namespace TestClassic.Repositories
 {
-   
     public class MerchantProductUpdateRequestRepository
     {
         private Uri node;
         private ConnectionSettings settings;
         private ElasticClient client;
 
-
         public MerchantProductUpdateRequestRepository()
         {
-            node = new Uri("http://localhost:9200");
+            //node = new Uri("http://localhost:9200");
+            node = new Uri("http://elastic1.test.cdon.com:9200");
             settings = new ConnectionSettings(node);
             //settings.PrettyJson().DisableDirectStreaming().OnRequestCompleted(details =>
             //{
@@ -38,56 +32,35 @@ namespace TestClassic.Repositories
 
             //});
             var productIndex = "products";
-            settings.DefaultIndex("louisesnewestdatabas");
+            settings.DefaultIndex("products");
             client = new ElasticClient(settings);
             //detta är för testning så att jag tar bort indexet varje gång programmet körs.
-            if (client.IndexExists(productIndex).Exists)
-                client.DeleteIndex(productIndex);
-            var createIndexResponse = client.CreateIndex(productIndex, c => c
-                .Mappings(m => m
-                    .Map<MerchantProductUpdateRequest>(p => p
-                        .AutoMap()
-                    )
-                )
-            );
+            //if (client.IndexExists(productIndex).Exists)
+            //    client.DeleteIndex(productIndex);
+            //var createIndexResponse = client.CreateIndex(productIndex, c => c
+            //    .Mappings(m => m
+            //        .Map<ProductModel>(p => p
+            //            .AutoMap()
+            //        )
+            //    )
+            //);
         }
 
-        public List<ProductModel> GetProducts(List<string> productIds)
+        public ProductModel GetProduct(string productId)
         {
-            List<ProductModel> products = new List<ProductModel>();
-
-            foreach (var productId in productIds)
-            {
-                var getResponse = client.Get<ProductModel>(productId);
-
-                products.Add(getResponse.Source);
-            }
-
-            return products;
+            var getResponse = client.Get<ProductModel>(productId);
+            return getResponse.Source;
         }
-        
-        //nedanstående metod är bara för testpurposes, tas bort sedan
-        public MerchantProductUpdateRequest CreateProduct (MerchantProductUpdateRequest product)
+                
+        public HttpStatusCode UpdateProduct(ProductModel product)
         {
-            //Ett nytt index av typen MerchantProductUpdateRequest läggs till i louisesdatabas
             var indexResponse = client.Index(product);
-
-            return product;
-        }
-        public List<ProductModel> UpdateProduct(List<ProductModel> products)
-        {
-            foreach (var product in products)
+            if (indexResponse.ApiCall.HttpStatusCode == 200)
             {
-               var indexResponse = client.Index(product);//fattar den själv att den ska radera de gamla produkterna?
+                return HttpStatusCode.Accepted;
             }
-
-            return products;
-        }
-
-        public void DeleteProduct (Guid apikey)
-        {
-            client.Delete<MerchantProductUpdateRequest>(apikey);
-
+            else
+                return HttpStatusCode.InternalServerError;    
         }
     }
 }
